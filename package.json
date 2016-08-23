@@ -1,0 +1,23 @@
+{
+  "name": "fact-scraper",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "transpile": "mkdir -p dist && babel *.js -d dist",
+    "scrape": "node dist/scraper.js",
+    "make-fortune": "node dist/fortune-maker.js && strfile factslides",
+    "install-fortune": "sudo mv -v factslides* /usr/share/games/fortunes"
+  },
+  "author": "Valentine Paramonov",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^0.20.0",
+    "rethinkdb": "^2.3.2",
+    "rethinkdb-init": "^0.2.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.10.4",
+    "babel-preset-es2015": "^6.9.0"
+  }
+}
