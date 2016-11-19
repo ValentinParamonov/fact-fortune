@@ -66,8 +66,8 @@ function extractFacts(document) {
         try {
             let data = document('script').not((i, e) => $(e).attr('src'))
                                          .first().text()
-            let ids = extractArray(data, 'itemIDs').slice(1)
-            let texts = extractArray(data, 'slideTexts').slice(1)
+            let ids = extractArray(data, 'itemsID').slice(1)
+            let texts = extractFactTexts(document)
             if (!(ids && texts)) return resolve([])
             resolve(ids.map((id, i) => ({id: parseInt(id), text: texts[i]})))
         } catch (error) {
@@ -81,6 +81,19 @@ function extractArray(script, arrayName) {
         .exec(script)
     if (!match) return []
     return eval(match[1])
+}
+
+
+function extractFactTexts($) {
+    return $('#items .i').not('#fe').map((i, e) =>
+        normalize($(e).text())
+    ).get()
+}
+
+function normalize(factText) {
+    return factText.trim()
+                   .replace(/\s+/g, ' ')
+                   .replace(/\s(\.|,)/g, '$1')
 }
 
 function storeFacts(connection) {
@@ -111,3 +124,5 @@ function pageProcessed(pageNumber) {
         resolve()
     })
 }
+
+

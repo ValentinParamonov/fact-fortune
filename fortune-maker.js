@@ -8,7 +8,7 @@ const connectionConfig = {
     db: 'factslides'
 }
 
-let out = fs.createWriteStream('factslides')
+const out = fs.createWriteStream('factslides')
 out.once('open', () => {
     r.connect(connectionConfig)
      .then(retrieveFacts)
@@ -40,14 +40,8 @@ function writeFactsTo(out) {
 
 function writeFactTo(out) {
     return factText => {
-        out.write(normalize(factText) + '\n')
+        out.write(factText + '\n')
         out.write('%\n')
     }
 }
 
-function normalize(factText) {
-    return factText.replace(/\s+/g, ' ')
-                   .replace(/\s(\.|,)/g, '$1')
-                   .replace(/^\s+/g, '')
-                   .replace(/\s+$/g, '')
-}
