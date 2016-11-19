@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o errexit
 
-npm run -s transpile
-npm run -s scrape
-npm run -s make-fortune
-npm run -s install-fortune
+yarn run transpile
+yarn run scrape
+yarn run make-fortune
+yarn run install-fortune
