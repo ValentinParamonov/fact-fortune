@@ -4,9 +4,9 @@ Fact Fortune
 ### Store [FactSlides][1] facts as a [fortune][2] file
 
 #### Prerequisites
-# [Yarn][3]
-# [Node][4]
-# [Docker][5]
+* [Yarn][3]
+* [Node][4]
+* [Docker][5]
 
 #### Install
 ```
