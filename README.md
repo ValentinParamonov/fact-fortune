@@ -8,6 +8,10 @@ Fact Fortune
 * [Node][4]
 * [Docker][5]
 
+#### Run [RethinkDB][6] container
+```
+docker run -d -p 8080:8080 -p 28015:28015 --name rethinkdb rethinkdb
+```
 #### Install
 ```
 yarn install
@@ -22,3 +26,5 @@ yarn install
 [3]: https://yarnpkg.com
 [4]: https://nodejs.org
 [5]: https://www.docker.com
+[6]: https://rethinkdb.com
+
