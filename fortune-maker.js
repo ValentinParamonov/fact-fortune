@@ -40,8 +40,17 @@ function writeFactsTo(out) {
 
 function writeFactTo(out) {
     return factText => {
-        out.write(factText + '\n')
+        out.write(withLineWidth(factText, 75) + '\n')
         out.write('%\n')
     }
 }
 
+function withLineWidth(text, width) {
+    return text.split(/\s/).reduce((a,b) => {
+        const init = a.slice(0,-1)
+        const [last] = a.slice(-1)
+        return last.length + b.length + 1 > width ? [...init, last, b] : [...init, `${last} ${b}`]
+    }, [''])
+    .join('\n')
+    .slice(1)
+}
