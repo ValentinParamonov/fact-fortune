@@ -64,7 +64,7 @@ function processPage(url) {
 function extractFacts(document) {
     return new Promise((resolve, reject) => {
         try {
-            let data = document('script').not((i, e) => $(e).attr('src'))
+            let data = document('script').filter((i, e) => Object.keys($(e)[0].attribs).length == 1)
                                          .first().text()
             let ids = extractArray(data, 'itemsID').slice(1)
             let texts = extractFactTexts(document)
