@@ -7,7 +7,7 @@
     "transpile": "mkdir -p dist && babel *.js -d dist",
     "scrape": "node dist/scraper.js",
     "make-fortune": "node dist/fortune-maker.js && strfile factslides",
-    "install-fortune": "sudo mv -v factslides* /usr/share/games/fortunes"
+    "install-fortune": "sudo mv -v factslides* /usr/share/fortune"
   },
   "author": "Valentine Paramonov",
   "license": "MIT",
