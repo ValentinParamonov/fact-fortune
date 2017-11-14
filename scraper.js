@@ -24,7 +24,8 @@ function processPages(connection) {
         if (lastPage < 2) done();
         const pages = [];
         for (let page = 2; page <= lastPage; page++) {
-            pages.push(schedulePageProcessing(page)
+            pages
+                .push(schedulePageProcessing(page)
                 .then(storeFacts(connection))
                 .then(pageProcessed(page)))
         }
@@ -46,7 +47,8 @@ function determineLastPage(connection) {
                     let newestDbFactId = newestDbFact.id;
                     let lastPage = Math.ceil((newestFactId - newestDbFactId) / FACTS_PER_PAGE);
                     if (lastPage !== 0) {
-                        storeFacts(connection)(facts).then(pageProcessed(1))
+                        storeFacts(connection)(facts)
+                            .then(pageProcessed(1))
                             .catch(processError)
                     }
                     return lastPage;
@@ -73,8 +75,8 @@ function extractFacts(document) {
     return new Promise((resolve, reject) => {
         try {
             const data = document('script')
-                .filter((i, e) =>
-                    Object.keys($(e)[0].attribs).length === 1
+                .filter((i, e) => 
+                    $(e).text().trim().startsWith('// ---- var declarations')
                 )
                 .first()
                 .text();
@@ -88,13 +90,6 @@ function extractFacts(document) {
     });
 }
 
-function extractArray(script, arrayName) {
-    let match = new RegExp(`var ${arrayName}\\s*=\\s*(new Array\\(.+\\));`, 'g').exec(script);
-    if (!match) return [];
-    return eval(match[1]);
-}
-
-
 function extractFactTexts($) {
     return $('#items .i')
         .not('#fe')
@@ -102,6 +97,12 @@ function extractFactTexts($) {
             normalize($(e).text())
         )
         .get();
+}
+
+function extractArray(script, arrayName) {
+    let match = new RegExp(`var ${arrayName}\\s*=\\s*(new Array\\(.+\\));`, 'g').exec(script);
+    if (!match) return [];
+    return eval(match[1]);
 }
 
 function normalize(factText) {
