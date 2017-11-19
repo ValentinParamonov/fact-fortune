@@ -76,27 +76,23 @@ function extractFacts(document) {
         try {
             const data = document('script')
                 .filter((i, e) => 
-                    $(e).text().trim().startsWith('// ---- var declarations')
+                    $(e)
+                        .text()
+                        .trim()
+                        .startsWith('// ---- var declarations')
                 )
                 .first()
                 .text();
             const ids = extractArray(data, 'itemsID').slice(1);
-            const texts = extractFactTexts(document);
+            const texts = extractArray(data, 'itemsHTML')
+                .slice(1)
+                .map(normalize);
             if (!(ids && texts)) return resolve([]);
             resolve(ids.map((id, i) => ({id: parseInt(id), text: texts[i]})));
         } catch (error) {
             reject(error);
         }
     });
-}
-
-function extractFactTexts($) {
-    return $('#items .i')
-        .not('#fe')
-        .map((i, e) =>
-            normalize($(e).text())
-        )
-        .get();
 }
 
 function extractArray(script, arrayName) {
@@ -108,6 +104,7 @@ function extractArray(script, arrayName) {
 function normalize(factText) {
     return factText
         .trim()
+        .replace(/<[^>]+>/g, '')
         .replace(/\s+/g, ' ')
         .replace(/\s(\.|,)/g, '$1');
 }
