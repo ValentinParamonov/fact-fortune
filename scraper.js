@@ -103,10 +103,10 @@ function extractArray(script, arrayName) {
 
 function normalize(factText) {
     return factText
-        .trim()
         .replace(/<[^>]+>/g, '')
         .replace(/\s+/g, ' ')
-        .replace(/\s(\.|,)/g, '$1');
+        .replace(/\s(\.|,)/g, '$1')
+        .trim();
 }
 
 function storeFacts(connection) {
