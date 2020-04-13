@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import request from 'request';
 import $ from 'cheerio';
 import r from 'rethinkdb';
@@ -12,49 +14,55 @@ const connectionConfig = {
     db: 'factslides'
 };
 
-init(r);
-r
-    .init(connectionConfig, ['facts'])
-    .then(processPages)
-    .then(done)
-    .catch(processError);
 
-function processPages(connection) {
-    return determineLastPage(connection).then(lastPage => {
-        if (lastPage < 2) done();
-        const pages = [];
-        for (let page = 2; page <= lastPage; page++) {
-            pages
-                .push(schedulePageProcessing(page)
-                .then(storeFacts(connection))
-                .then(pageProcessed(page)))
-        }
-        return Promise.all(pages)
-    });
+async function main() {
+    try {
+        init(r);
+        const connection = await r.init(connectionConfig, ['facts'])
+        await processPages(connection);
+        done();
+    } catch (e) {
+        processError(e);
+    }
 }
 
-function determineLastPage(connection) {
-    return r
+async function processPages(connection) {
+    const lastPage = await determineLastPage(connection);
+    if (lastPage < 2) done();
+    const pages = [];
+    for (let page = 2; page <= lastPage; page++) {
+        pages.push(async () => {
+            const facts = await schedulePageProcessing(page);
+            await storeFacts(connection)(facts);
+            await pageProcessed(page);
+        });
+    }
+    return Promise.all(pages);
+}
+
+async function determineLastPage(connection) {
+    const newestDbFact = await r
         .table('facts')
         .max('id')
         .default({id: 0})
-        .run(connection)
-        .then(newestDbFact =>
-            schedulePageProcessing(1).then(facts => {
-                    let newestFactId = facts
-                        .map(f => f.id)
-                        .reduce((a, b) => Math.max(a, b));
-                    let newestDbFactId = newestDbFact.id;
-                    let lastPage = Math.ceil((newestFactId - newestDbFactId) / FACTS_PER_PAGE);
-                    if (lastPage !== 0) {
-                        storeFacts(connection)(facts)
-                            .then(pageProcessed(1))
-                            .catch(processError)
-                    }
-                    return lastPage;
-                }
-            )
-        );
+        .run(connection);
+            
+    const facts = await schedulePageProcessing(1);
+
+    const newestFactId = facts
+        .map(f => f.id)
+        .reduce((a, b) => Math.max(a, b));
+    const newestDbFactId = newestDbFact.id;
+    const lastPage = Math.ceil((newestFactId - newestDbFactId) / FACTS_PER_PAGE);
+    if (lastPage !== 0) {
+        try {
+            await storeFacts(connection)(facts)
+            pageProcessed(1);
+        } catch (e) {
+            processError(e);
+        }
+    }
+    return lastPage;
 }
 
 function schedulePageProcessing(pageNumber) {
@@ -133,10 +141,11 @@ function processError(error) {
 }
 
 function pageProcessed(pageNumber) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         console.log(`Page ${pageNumber} processed.`);
         resolve();
     });
 }
 
+main();
 
